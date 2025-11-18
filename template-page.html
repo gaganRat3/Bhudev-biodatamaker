@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choose Template - BioData Maker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="bg-gray-50 min-h-screen p-4">
+    <div class="container max-w-6xl mx-auto">
+      <!-- Template Gallery -->
+      <div id="template-gallery">
+        <h1
+          class="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2"
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          Choose a Template
+        </h1>
+
+        <div class="template-grid">
+          <!-- Free Template -->
+          <div class="template-preview-card free-template">
+            <div class="template-badge free-badge">FREE</div>
+            <img
+              src="assets/temp1.png"
+              alt="Template 1"
+              class="template-preview-image"
+            />
+            <div class="p-4">
+              <button
+                onclick="selectTemplate(1)"
+                class="btn btn-primary w-full"
+              >
+                View Template
+              </button>
+            </div>
+          </div>
+
+          <!-- Paid Template (templateId: 2) -->
+          <div class="template-preview-card paid-template">
+            <div class="template-badge paid-badge">PREMIUM</div>
+            <img
+              src="assets/temp2.png"
+              alt="Template 2"
+              class="template-preview-image"
+            />
+            <div class="p-4">
+              <button
+                onclick="selectTemplate(2)"
+                class="btn btn-primary w-full"
+              >
+                Preview Template
+              </button>
+            </div>
+          </div>
+
+          <!-- Paid Template (templateId: 3) -->
+          <div class="template-preview-card paid-template">
+            <div class="template-badge paid-badge">PREMIUM</div>
+            <img
+              src="assets/temp3.png"
+              alt="Template 3"
+              class="template-preview-image"
+            />
+            <div class="p-4">
+              <button
+                onclick="selectTemplate(3)"
+                class="btn btn-primary w-full"
+              >
+                Preview Template
+              </button>
+            </div>
+          </div>
+
+          <!-- Paid Template (templateId: 4) -->
+          <div class="template-preview-card paid-template">
+            <div class="template-badge paid-badge">PREMIUM</div>
+            <img
+              src="assets/temp4.png"
+              alt="Template 4"
+              class="template-preview-image"
+            />
+            <div class="p-4">
+              <button
+                onclick="selectTemplate(4)"
+                class="btn btn-primary w-full"
+              >
+                Preview Template
+              </button>
+            </div>
+          </div>
+
+          <!-- Paid Template (templateId: 5) -->
+          <div class="template-preview-card paid-template">
+            <div class="template-badge paid-badge">PREMIUM</div>
+            <img
+              src="assets/temp5.png"
+              alt="Template 5"
+              class="template-preview-image"
+            />
+            <div class="p-4">
+              <button
+                onclick="selectTemplate(5)"
+                class="btn btn-primary w-full"
+              >
+                Preview Template
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template View -->
+      <div id="template-view" class="hidden">
+        <button onclick="backToGallery()" class="btn mb-6">
+          ← Back to Templates
+        </button>
+
+        <!-- Template Content renders directly here without container -->
+        <div id="template-content"></div>
+
+        <button
+          onclick="handleDownload()"
+          class="btn btn-primary"
+          id="download-btn"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            width="20"
+            height="20"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/template-page.js"></script>
+
+    <!-- Registration Modal for premium downloads -->
+    <div id="reg-modal" class="hidden" tabindex="-1" aria-hidden="true">
+      <div class="modal-overlay" onclick="hideRegistrationModal()"></div>
+      <div
+        class="modal-card card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reg-title"
+        style="
+          max-width: 480px;
+          margin: 40px auto;
+          position: relative;
+          z-index: 50;
+          padding: 20px;
+        "
+      >
+        <h3 id="reg-title" class="card-title">Register to Request Download</h3>
+        <p style="margin: 8px 0 16px; color: #374151; font-size: 0.95rem">
+          Please enter your details. We'll save your biodata request and notify
+          you when admin approves it.
+        </p>
+        <form id="reg-form" onsubmit="submitRegistration(event)">
+          <div class="form-group">
+            <label class="form-label">Full name</label>
+            <input
+              id="reg-name"
+              class="form-input"
+              type="text"
+              placeholder="Your full name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              id="reg-email"
+              class="form-input"
+              type="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input
+              id="reg-phone"
+              class="form-input"
+              type="tel"
+              placeholder="Optional phone number"
+            />
+          </div>
+            <div class="form-group">
+              <label class="form-label">QR Image</label>
+              <div style="padding: 8px 0;">
+                <img src="assets/your-qr-image.png" alt="QR Code" style="max-width: 180px; border: 1px solid #ccc; border-radius: 8px;" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload Payment Screenshot</label>
+              <input
+                id="reg-payment-screenshot"
+                class="form-input"
+                type="file"
+                accept="image/*"
+              />
+            </div>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              justify-content: flex-end;
+              margin-top: 14px;
+            "
+          >
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onclick="hideRegistrationModal()"
+            >
+              Cancel
+            </button>
+            <button id="reg-submit" type="submit" class="btn btn-primary">
+              Submit & Request Download
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <style>
+      /* 3-Column Grid Layout */
+      .template-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-top: 30px;
+        padding: 0 20px;
+      }
+
+      /* Responsive grid - 2 columns on tablets, 1 column on mobile */
+      @media (max-width: 1024px) {
+        .template-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 25px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .template-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          padding: 0 10px;
+        }
+      }
+
+      .template-preview-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+        max-width: 100%;
+        position: relative;
+      }
+
+      .template-preview-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Free template styling: use White.png border (only for free preview) */
+      .free-template {
+        /* remove solid color border so we can show the image border */
+        border: none;
+        position: relative; /* establish stacking context for pseudo-element */
+        padding: 0; /* keep layout consistent with preview image */
+      }
+
+      /* Show the decorative frame for the free template using a pseudo-element
+         This keeps the change scoped to the free preview only and does not
+         affect other template preview cards. */
+      .free-template::before {
+        content: "";
+        position: absolute;
+        inset: 0; /* top:0; right:0; bottom:0; left:0 */
+        background-image: url("assets/border/White.png");
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Ensure the inner content sits above the decorative border */
+      .free-template > * {
+        position: relative;
+        z-index: 1;
+      }
+
+
+      /* Paid template styling */
+      .paid-template {
+        border: 2px solid #f59e0b;
+        position: relative;
+      }
+
+      .paid-template:hover {
+        border-color: #d97706;
+      }
+
+      /* Template badges */
+      .template-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        z-index: 10;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .free-badge {
+        background: #10b981;
+        color: white;
+      }
+
+      .paid-badge {
+        background: #f59e0b;
+        color: white;
+      }
+
+      /* Watermark for premium templates */
+      .premium-watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 3rem;
+        font-weight: bold;
+        color: rgba(245, 158, 11, 0.3);
+        pointer-events: none;
+        z-index: 15;
+        white-space: nowrap;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        letter-spacing: 3px;
+        font-family: Arial, sans-serif;
+      }
+
+      /* Download button styling for premium templates */
+      .download-premium {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .download-premium:hover {
+        background: linear-gradient(135deg, #b91c1c, #991b1b);
+        transform: translateY(-2px);
+      }
+
+      .template-preview-image {
+        width: 100%;
+        height: 256px;
+        object-fit: contain;
+        cursor: pointer;
+      }
+
+      /* Biodata content renders directly in template-content */
+      .biodata-template {
+        max-width: 100%;
+        margin: 0;
+        background: transparent;
+        padding: 0;
+        border: none;
+        position: relative;
+        z-index: 1;
+        font-family: "Times New Roman", serif;
+        border-radius: 0;
+        min-height: auto;
+      }
+
+      .biodata-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .biodata-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f59e0b;
+      }
+
+      .biodata-field {
+        display: flex;
+        margin-bottom: 0.5rem;
+      }
+
+      .biodata-field-label {
+        font-weight: 600;
+        color: #374151;
+        min-width: 200px;
+      }
+
+      .biodata-field-value {
+        color: #6b7280;
+      }
+
+      .biodata-profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 15px;
+        display: block;
+        border: 4px solid #8b4513;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Centered name styling matching the screenshot */
+      .biodata-name {
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0 0 25px 0;
+        letter-spacing: 1px;
+        font-family: "Times New Roman", serif;
+      }
+
+      /* Section pill headers matching the screenshot */
+      .section-pill {
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin: 0 auto 18px;
+        display: block;
+        width: fit-content;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 6px rgba(230, 126, 34, 0.4);
+        font-family: "Times New Roman", serif;
+      }
+
+      .biodata-section {
+        margin-bottom: 25px;
+      }
+
+      /* Two columns layout matching the screenshot */
+      .detail-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 26px;
+        row-gap: 1px;
+        margin-top: 10px;
+        padding: 0;
+        position: relative;
+      }
+
+      .detail-columns::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #bdc3c7;
+        transform: translateX(-50%);
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1px 0;
+        margin-bottom: 1px;
+      }
+
+      .detail-label {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.88rem;
+        width: 97%;
+        font-family: "Times New Roman", serif;
+      }
+
+      .detail-value {
+        color: #34495e;
+        font-size: 0.88rem;
+        width: 72%;
+        text-align: right;
+        font-weight: 500;
+        font-family: "Times New Roman", serif;
+      }
+
+      /* Template content is now the direct border container */
+      #template-content {
+        background-image: url("assets/border/bg1.jpg");
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 60px 80px;
+        position: relative;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 0;
+        min-height: 800px;
+        width: 600px;
+        max-width: 600px;
+        margin: 20px auto;
+      }
+
+      /* Canvas wrapper for mobile - contains the fixed-width template */
+      @media (max-width: 768px) {
+        #template-view {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        #template-content {
+          width: 600px;
+          min-width: 600px;
+          max-width: 600px;
+          margin: 20px 0;
+          /* Keep all other properties the same */
+        }
+      }
+
+      /* Alternative border styles for template-content */
+      #template-content.free-border {
+        background-image: url("assets/border/White.png");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-1 {
+        background-image: url("assets/border/White.png");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-2 {
+        background-image: url("assets/border/bg0.png");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-3 {
+        /* Use bg3.jpg for the 3rd template preview as requested */
+        background-image: url("assets/border/bg3.jpg");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-4 {
+        background-image: url("assets/border/bg8.jpg");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-5 {
+        background-image: url("assets/border/bg9.jpg");
+        background-size: 100% 100%;
+      }
+      #template-content.border-style-6 {
+        background-image: url("assets/border/bg10.jpg");
+        background-size: 100% 100%;
+      }
+
+      /* Keep two-column layout on all screen sizes */
+      @media (max-width: 768px) {
+        .detail-columns {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .detail-columns::before {
+          display: block;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Biodata - BioData Maker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/biodata-form.css" />
+    <!-- SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen py-8 px-4">
+    <div class="container max-w-2xl mx-auto">
+      <div class="card shadow-lg">
+        <!-- Header -->
+        <div class="card-header bg-gray-900 text-white rounded-t-lg">
+          <div class="flex justify-between items-center">
+            <h1 class="card-title text-xl font-semibold">
+              Create Marriage Biodata
+            </h1>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                id="reset-form-btn"
+                class="btn btn-outline bg-white text-gray-900"
+              >
+                Reset Form
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="card-content p-4">
+          <form id="biodata-form">
+            <!-- Profile Image -->
+            <div class="flex flex-col items-center mb-6">
+              <div id="image-preview-container" class="image-preview-container">
+                <svg
+                  class="camera-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                  />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                <img id="image-preview" class="hidden" alt="Profile Preview" />
+              </div>
+              <label
+                for="profile-image"
+                class="btn bg-gray-800 text-white mt-4 cursor-pointer"
+                style="
+                  display: inline-block;
+                  background-color: #1f2937 !important;
+                  color: white !important;
+                  padding: 12px 24px;
+                  border-radius: 8px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  margin-top: 16px;
+                  text-align: center;
+                  border: none;
+                  font-size: 14px;
+                "
+              >
+                Upload Profile Photo
+              </label>
+              <input
+                type="file"
+                id="profile-image"
+                accept="image/*"
+                class="hidden"
+              />
+            </div>
+
+            <!-- Personal Details Section -->
+            <div class="section-container mb-6">
+              <button
+                type="button"
+                class="section-header"
+                data-section="PersonalDetails"
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class="section-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Personal Details</span>
+                </div>
+                <svg
+                  class="chevron-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div class="section-content" id="PersonalDetails-content">
+                <div
+                  class="sortable-container"
+                  id="PersonalDetails-fields"
+                ></div>
+                <button
+                  type="button"
+                  class="btn btn-ghost w-full mt-3 add-field-btn"
+                  data-section="PersonalDetails"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="16"
+                    height="16"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Field
+                </button>
+              </div>
+            </div>
+
+            <!-- Family Details Section -->
+            <div class="section-container mb-6">
+              <button
+                type="button"
+                class="section-header"
+                data-section="FamilyDetails"
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class="section-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <span>Family Details</span>
+                </div>
+                <svg
+                  class="chevron-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div class="section-content hidden" id="FamilyDetails-content">
+                <div class="sortable-container" id="FamilyDetails-fields"></div>
+                <button
+                  type="button"
+                  class="btn btn-ghost w-full mt-3 add-field-btn"
+                  data-section="FamilyDetails"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="16"
+                    height="16"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Field
+                </button>
+              </div>
+            </div>
+
+            <!-- Habits & Declaration Section -->
+            <div class="section-container mb-6">
+              <button
+                type="button"
+                class="section-header"
+                data-section="HabitsDeclaration"
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class="section-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Habits & Declaration</span>
+                </div>
+                <svg
+                  class="chevron-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div
+                class="section-content hidden"
+                id="HabitsDeclaration-content"
+              >
+                <div
+                  class="sortable-container"
+                  id="HabitsDeclaration-fields"
+                ></div>
+                <button
+                  type="button"
+                  class="btn btn-ghost w-full mt-3 add-field-btn"
+                  data-section="HabitsDeclaration"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="16"
+                    height="16"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Field
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary w-full bg-gray-900 text-white py-3"
+            >
+              Generate Biodata
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/biodata-form.js"></script>
+  </body>
+</html>

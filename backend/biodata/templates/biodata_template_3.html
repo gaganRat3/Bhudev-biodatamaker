@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biodata Premium Template 3</title>
+    <style>
+      body {
+        background: #f3f4f6;
+        font-family: 'Times New Roman', serif;
+        margin: 0;
+        padding: 0;
+      }
+      #template-content {
+        position: relative;
+        padding: 0;
+        min-height: 100vh;
+        width: 700px;
+        margin: 40px auto;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .template-border {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .template-inner {
+        position: relative;
+      .template-inner {
+        position: relative;
+        z-index: 1;
+        background: transparent;
+        width: 100%;
+        height: 100%;
+        padding: 80px 100px;
+        box-sizing: border-box;
+      }
+      .biodata-name {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #d35400;
+        margin-bottom: 2rem;
+      }
+      .section-pill {
+        background: linear-gradient(135deg, #e67e22, #f39c12);
+        color: white;
+        padding: 10px 24px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: block;
+        width: fit-content;
+        margin: 0 auto 16px;
+      }
+      /* PDF-friendly two-column layout */
+      .detail-columns {
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .detail-columns .col {
+        float: left;
+        width: 48%;
+        margin-right: 4%;
+      }
+      .detail-columns .col:last-child { margin-right: 0; }
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dotted #e67e22;
+      }
+        border-bottom: 1px dotted #e67e22;
+      }
+      .biodata-profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: block;
+        margin: 0 auto 12px;
+        object-fit: cover;
+        border: 4px solid #e67e22;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="template-content">
+      <img src="{{ border_image_path|default:'/assets/border/bg6.png' }}" class="template-border" alt="Border" />
+      <div class="template-inner">
+        {% if profile_image_path %}
+        <img src="{{ profile_image_path }}" class="biodata-profile-image" alt="Profile" />
+        {% elif biodata.profile_image %}
+        <img src="{{ biodata.profile_image.url }}" class="biodata-profile-image" alt="Profile" />
+        {% endif %}
+
+        <h2 class="biodata-name">{{ biodata.data.PersonalDetails.name|default:'' }}</h2>
+      {% if biodata.data.PersonalDetails %}
+      <div class="section-pill">Personal Details</div>
+      <div class="detail-columns">
+        <div class="col">
+          {% if personal_left %}
+            {% for key,value in personal_left %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% else %}
+            {% for key,value in biodata.data.PersonalDetails.items %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="col">
+          {% if personal_right %}
+            {% for key,value in personal_right %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% if biodata.data.FamilyDetails %}
+      <div style="margin-top: 20px" class="section-pill">Family Details</div>
+      <div class="detail-columns">
+        <div class="col">
+          {% if family_left %}
+            {% for key,value in family_left %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% else %}
+            {% for key,value in biodata.data.FamilyDetails.items %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="col">
+          {% if family_right %}
+            {% for key,value in family_right %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% if biodata.data.HabitsDeclaration %}
+      <div style="margin-top: 20px" class="section-pill">Habits & Declaration</div>
+      <div class="detail-columns">
+        <div class="col">
+          {% if habits_left %}
+            {% for key,value in habits_left %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% else %}
+            {% for key,value in biodata.data.HabitsDeclaration.items %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="col">
+          {% if habits_right %}
+            {% for key,value in habits_right %}
+              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      </div>
+    </div>
+  </body>
+</html>

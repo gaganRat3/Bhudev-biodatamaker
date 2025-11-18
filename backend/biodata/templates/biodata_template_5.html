@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="utf-8" />
+    <title>Biodata Template 5</title>
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: white;
+        margin: 0;
+        padding: 0;
+      }
+
+      #template-content {
+        width: 700px;
+        max-width: 700px;
+        background: #fff;
+        border: 8px solid #dc143c;
+        box-sizing: border-box;
+        margin: 20px auto;
+        min-height: 800px;
+        position: relative;
+        padding: 0;
+      }
+
+      .biodata-header {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        margin-left: -100px;
+        width: 200px;
+        text-align: center;
+        z-index: 10;
+      }
+
+      .biodata-logo {
+        font-size: 24px;
+        color: #dc143c;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .biodata-title {
+        font-size: 18px;
+        color: #dc143c;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .main-content {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        width: 100%;
+        min-height: 800px;
+        box-sizing: border-box;
+        padding: 80px 20px 80px 20px;
+      }
+
+      .profile-section {
+        width: 200px;
+        float: right;
+        text-align: center;
+      }
+
+      .biodata-profile-image {
+        width: 150px;
+        height: 180px;
+        border: 2px solid #000;
+        display: block;
+        margin: 0 auto 20px auto;
+      }
+
+      .profile-placeholder {
+        width: 150px;
+        height: 180px;
+        border: 2px solid #000;
+        background: #f0f0f0;
+        text-align: center;
+        line-height: 180px;
+        color: #666;
+        font-size: 12px;
+        margin: 0 auto 20px auto;
+      }
+
+      .content-section {
+        margin-right: 220px;
+        padding: 0 10px;
+      }
+
+      .section-title {
+        background: #4169e1;
+        color: #fff;
+        padding: 8px 15px;
+        font-weight: bold;
+        font-size: 14px;
+        margin: 20px 0 10px 0;
+        text-transform: uppercase;
+      }
+
+      .section-title:first-of-type {
+        margin-top: 0;
+      }
+
+      .two-column-grid {
+        width: 100%;
+        margin-bottom: 15px;
+      }
+
+      .grid-column {
+        width: 48%;
+        float: left;
+        margin-right: 4%;
+      }
+
+      .grid-column:last-child {
+        margin-right: 0;
+      }
+
+      .detail-item {
+        margin-bottom: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .detail-label {
+        color: #4169e1;
+        margin-bottom: 2px;
+      }
+
+      .detail-value {
+        color: #000;
+      }
+
+      .clearfix:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      .footer-disclaimer {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        margin-left: -315px;
+        width: 630px;
+        text-align: center;
+        font-size: 10px;
+        color: #666;
+        border-top: 1px dashed #ccc;
+        padding-top: 10px;
+      }
+
+      .footer-disclaimer .highlight {
+        color: #dc143c;
+        font-weight: bold;
+      }
+
+      .footer-website {
+        position: absolute;
+        bottom: 5px;
+        right: 15px;
+        font-size: 10px;
+        color: #4169e1;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="template-content">
+      <div class="biodata-header">
+        <div class="biodata-logo">🕉</div>
+        <div class="biodata-title">BIO DATA</div>
+      </div>
+
+      <div class="main-content">
+        <div class="profile-section">
+          {% if profile_image_path %}
+          <img src="{{ profile_image_path }}" class="biodata-profile-image" alt="Profile" />
+          {% elif biodata.profile_image %}
+          <img src="{{ biodata.profile_image.url }}" class="biodata-profile-image" alt="Profile" />
+          {% else %}
+          <div class="profile-placeholder">Profile Photo</div>
+          {% endif %}
+        </div>
+
+        <div class="content-section">
+          {% if personal_left or personal_right %}
+          <div class="section-title">PERSONAL DETAILS</div>
+          <div class="two-column-grid clearfix">
+            <div class="grid-column">
+              {% for key, value in personal_left %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="grid-column">
+              {% for key, value in personal_right %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if family_left or family_right %}
+          <div class="section-title">FAMILY DETAILS</div>
+          <div class="two-column-grid clearfix">
+            <div class="grid-column">
+              {% for key, value in family_left %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="grid-column">
+              {% for key, value in family_right %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if habits_left or habits_right %}
+          <div class="section-title">HABITS & DECLARATION</div>
+          <div class="two-column-grid clearfix">
+            <div class="grid-column">
+              {% for key, value in habits_left %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="grid-column">
+              {% for key, value in habits_right %}
+              <div class="detail-item">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="footer-disclaimer">
+        This is a preview, and some data are hidden 🔒<br>
+        But, the <span class="highlight">downloaded biodata will contain complete details</span>
+      </div>
+
+      <div class="footer-website">www.CreateMyBiodata.com</div>
+    </div>
+  </body>
+</html>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: white;
+        color: #000;
+      }
+
+      #template-content {
+        position: relative;
+        padding: 0;
+        width: 700px;
+        margin: 20px auto;
+        background: #fff;
+        border: 8px solid #dc143c;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .biodata-header {
+        text-align: center;
+        padding: 20px 0 10px 0;
+      }
+
+      .biodata-logo {
+        font-size: 24px;
+        color: #dc143c;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .biodata-title {
+        font-size: 18px;
+        color: #dc143c;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .template-inner {
+        position: relative;
+        padding: 20px 30px 80px 30px;
+        min-height: 700px;
+      }
+
+      .content-wrapper {
+        width: 100%;
+        position: relative;
+      }
+
+      .content-left {
+        float: left;
+        width: 420px;
+        padding-right: 20px;
+      }
+
+      .content-right {
+        float: right;
+        width: 180px;
+        text-align: center;
+      }
+
+      .biodata-profile-image {
+        width: 150px;
+        height: 180px;
+        border: 2px solid #000;
+        margin-bottom: 10px;
+      }
+
+      .profile-placeholder {
+        width: 150px;
+        height: 180px;
+        background: #f0f0f0;
+        border: 2px solid #000;
+        line-height: 180px;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+      }
+
+      .section-title {
+        background: #4169e1;
+        color: #fff;
+        padding: 8px 15px;
+        font-weight: bold;
+        font-size: 13px;
+        margin: 20px 0 10px 0;
+        text-transform: uppercase;
+      }
+
+      .section-title:first-of-type {
+        margin-top: 0;
+      }
+
+      .detail-grid {
+        width: 100%;
+        margin-bottom: 15px;
+      }
+
+      .detail-row {
+        width: 100%;
+        margin-bottom: 6px;
+        overflow: hidden;
+      }
+
+      .detail-label {
+        float: left;
+        width: 45%;
+        color: #4169e1;
+        font-size: 11px;
+        font-weight: normal;
+      }
+
+      .detail-value {
+        float: left;
+        width: 55%;
+        color: #000;
+        font-size: 11px;
+      }
+
+      .clearfix:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      .footer-disclaimer {
+        position: absolute;
+        bottom: 35px;
+        left: 30px;
+        right: 30px;
+        text-align: center;
+        font-size: 9px;
+        color: #666;
+        border-top: 1px dashed #ccc;
+        padding-top: 8px;
+      }
+
+      .footer-disclaimer .highlight {
+        color: #dc143c;
+        font-weight: bold;
+      }
+
+      .footer-website {
+        position: absolute;
+        bottom: 10px;
+        right: 30px;
+        font-size: 9px;
+        color: #4169e1;
+        font-weight: bold;
+      }
+
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        #template-content {
+          border: 8px solid #dc143c !important;
+          width: 700px !important;
+          max-width: 700px !important;
+          margin: 0 auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="template-content">
+      <div class="biodata-header">
+        <div class="biodata-logo">🕉</div>
+        <div class="biodata-title">BIO DATA</div>
+      </div>
+
+      <div class="template-inner">
+        <div class="content-wrapper clearfix">
+          <div class="content-right">
+            {% if profile_image_path %}
+            <img src="{{ profile_image_path }}" class="biodata-profile-image" alt="Profile" />
+            {% elif biodata.profile_image %}
+            <img src="{{ biodata.profile_image.url }}" class="biodata-profile-image" alt="Profile" />
+            {% else %}
+            <div class="profile-placeholder">Profile Photo</div>
+            {% endif %}
+          </div>
+
+          <div class="content-left">
+            {% if personal_left or personal_right %}
+            <div class="section-title">PERSONAL DETAILS</div>
+            <div class="detail-grid">
+              {% for key, value in personal_left %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+              {% for key, value in personal_right %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if family_left or family_right %}
+            <div class="section-title">FAMILY DETAILS</div>
+            <div class="detail-grid">
+              {% for key, value in family_left %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+              {% for key, value in family_right %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if habits_left or habits_right %}
+            <div class="section-title">HABITS & DECLARATION</div>
+            <div class="detail-grid">
+              {% for key, value in habits_left %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+              {% for key, value in habits_right %}
+              <div class="detail-row clearfix">
+                <div class="detail-label">{{ key|title }}</div>
+                <div class="detail-value">{{ value }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+      <div class="footer-disclaimer">
+        This is a preview, and some data are hidden 🔒<br>
+        But, the <span class="highlight">downloaded biodata will contain complete details</span>
+      </div>
+
+      <div class="footer-website">www.CreateMyBiodata.com</div>
+    </div>
+  </body>
+</html>

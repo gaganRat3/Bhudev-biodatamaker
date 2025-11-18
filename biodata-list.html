@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biodata List - BioData Maker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="bg-gray-50 min-h-screen py-8 px-4">
+    <div class="container max-w-4xl mx-auto">
+      <div class="card shadow-lg">
+        <div class="card-header bg-gray-900 text-white rounded-t-lg">
+          <h1 class="card-title text-xl font-semibold text-center">
+            Biodata List
+          </h1>
+        </div>
+
+        <div class="card-content p-4">
+          <div id="loading" class="text-center py-8">
+            <div class="spinner mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading biodata...</p>
+          </div>
+
+          <div id="error" class="hidden alert alert-error"></div>
+
+          <div id="empty" class="hidden text-center py-8 text-gray-600">
+            <p>No biodata entries found.</p>
+          </div>
+
+          <div id="biodata-container" class="hidden"></div>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <a href="index.html" class="text-blue-600 hover:text-blue-800"
+          >← Back to Home</a
+        >
+      </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/biodata-list.js"></script>
+  </body>
+</html>

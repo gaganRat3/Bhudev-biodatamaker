@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - BioData Maker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto py-8">
+      <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-gray-900">Welcome Back</h1>
+          <p class="text-gray-600 mt-2">
+            Sign in to your account or create a new one
+          </p>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alert-container"></div>
+
+        <!-- Already Logged In Message (hidden by default) -->
+        <div id="logged-in-message" class="card p-6 text-center hidden">
+          <h2 class="text-2xl font-bold mb-4 text-green-600">
+            Already Logged In!
+          </h2>
+          <p class="text-gray-600 mb-4">
+            You are already logged in. Redirecting to home...
+          </p>
+          <button
+            onclick="window.location.href='index.html'"
+            class="btn btn-primary"
+          >
+            Go to Home
+          </button>
+        </div>
+
+        <!-- Auth Form -->
+        <div id="auth-form-container" class="card shadow-lg">
+          <div class="card-content p-6">
+            <h2 id="form-title" class="text-2xl font-bold mb-6 text-center">
+              Login
+            </h2>
+
+            <form id="auth-form" class="space-y-4">
+              <!-- Username -->
+              <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <!-- Email (hidden for login) -->
+              <div id="email-group" class="form-group hidden">
+                <label for="email" class="form-label">Email (Optional)</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-input"
+                />
+              </div>
+
+              <!-- Password -->
+              <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                id="submit-btn"
+                class="btn btn-primary w-full"
+              >
+                Login
+              </button>
+            </form>
+
+            <!-- Toggle Link -->
+            <div class="mt-4 text-center">
+              <button id="toggle-btn" class="text-blue-600 hover:text-blue-800">
+                Don't have an account? Register
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="mt-6 text-center">
+          <a href="index.html" class="text-blue-600 hover:text-blue-800">
+            ← Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+# Django
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+db.sqlite3
+db.sqlite3-journal
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment Variables - NEVER COMMIT THESE!
+.env
+.env.local
+.env.*.local
+
+# Django Static/Media Files
+/staticfiles/
+/media/
+
+# Logs
+*.log
+logs/
+django.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Email Testing
+sent_emails/
