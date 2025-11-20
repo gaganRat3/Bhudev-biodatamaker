@@ -1,10 +1,12 @@
 from django.db import models
 
 
+
 class Biodata(models.Model):
     title = models.CharField(max_length=255, blank=True)
     data = models.JSONField(default=dict, blank=True)
     profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    payment_screenshot = models.ImageField(upload_to='payments/', null=True, blank=True)
     # New fields for workflow
     template_choice = models.CharField(max_length=100, blank=True)
     user_name = models.CharField(max_length=100, blank=True)

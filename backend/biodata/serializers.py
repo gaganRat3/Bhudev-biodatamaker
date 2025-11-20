@@ -4,11 +4,12 @@ import json
 
 
 
+
 class BiodataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Biodata
         fields = (
-            'id', 'title', 'data', 'profile_image',
+            'id', 'title', 'data', 'profile_image', 'payment_screenshot',
             'template_choice', 'user_name', 'user_email', 'user_phone',
             'is_approved', 'download_link',
             'created_at', 'updated_at'
@@ -26,7 +27,8 @@ class BiodataSerializer(serializers.ModelSerializer):
         # Extract only fields we care about into a plain dict
         incoming = {}
         # include fields that may be submitted from the frontend when requesting premium downloads
-        for key in ('title', 'profile_image', 'data', 'template_choice', 'user_name', 'user_email', 'user_phone'):
+
+        for key in ('title', 'profile_image', 'payment_screenshot', 'data', 'template_choice', 'user_name', 'user_email', 'user_phone'):
             if key in data:
                 incoming[key] = data.get(key)
 

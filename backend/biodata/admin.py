@@ -10,13 +10,53 @@ from django.utils.html import format_html
 
 @admin.register(Biodata)
 class BiodataAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'user_name', 'user_email', 'template_choice', 'is_approved', 'created_at')
-    readonly_fields = ('created_at', 'updated_at')
+    list_display = (
+        'id', 'title', 'user_name', 'user_email', 'template_choice', 'is_approved', 'created_at', 'payment_screenshot_thumb'
+    )
+    readonly_fields = ('created_at', 'updated_at', 'payment_screenshot_preview')
     exclude = ('download_link',)
     list_filter = ('is_approved', 'template_choice')
     search_fields = ('title', 'user_name', 'user_email', 'user_phone')
 
-    actions = ['approve_biodata']
+    actions = ['approve_biodata', 'export_to_excel']
+
+    def payment_screenshot_thumb(self, obj):
+        # Robust thumbnail for list view. Try storage URL first, fall back to MEDIA_URL + name.
+        if obj.payment_screenshot:
+            try:
+                url = obj.payment_screenshot.url
+            except Exception:
+                # Some storage backends may not provide .url; build from MEDIA_URL
+                from django.conf import settings
+                name = getattr(obj.payment_screenshot, 'name', '')
+                url = f"{getattr(settings, 'MEDIA_URL', '/media/')}{name.lstrip('/')}" if name else None
+
+            if url:
+                return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:40px;max-width:60px;"/></a>', url, url)
+        return "-"
+    payment_screenshot_thumb.short_description = 'Payment Screenshot'
+
+    def export_to_excel(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="biodata_export.csv"'
+        writer = csv.writer(response)
+        fields = ['id', 'title', 'user_name', 'user_email', 'template_choice', 'is_approved', 'created_at', 'payment_screenshot']
+        writer.writerow(fields)
+        for obj in queryset:
+            writer.writerow([
+                obj.id,
+                obj.title,
+                obj.user_name,
+                obj.user_email,
+                obj.template_choice,
+                obj.is_approved,
+                obj.created_at,
+                (getattr(obj.payment_screenshot, 'url', '') if getattr(obj, 'payment_screenshot', None) else '')
+            ])
+        return response
+    export_to_excel.short_description = "Export selected to Excel (CSV)"
     # Set up file logger
     logger = logging.getLogger("biodata_admin")
     file_handler = logging.FileHandler("biodata_admin.log", encoding="utf-8")
@@ -475,6 +515,21 @@ class BiodataAdmin(admin.ModelAdmin):
 </body>
 </html>'''
         return html
+
+    def payment_screenshot_preview(self, obj):
+        """Show a larger preview in the change form (readonly)."""
+        if not obj or not getattr(obj, 'payment_screenshot', None):
+            return "No screenshot uploaded"
+        try:
+            url = obj.payment_screenshot.url
+        except Exception:
+            from django.conf import settings
+            name = getattr(obj.payment_screenshot, 'name', '')
+            url = f"{getattr(settings, 'MEDIA_URL', '/media/')}{name.lstrip('/')}" if name else None
+        if not url:
+            return "No screenshot available"
+        return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:220px;max-width:320px;border:1px solid #ccc;"/></a>', url, url)
+    payment_screenshot_preview.short_description = 'Payment Screenshot Preview'
 
     def _format_detail_grid(self, details_dict):
         """Format details as grid items matching frontend"""
