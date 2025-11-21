@@ -304,36 +304,22 @@ function createFieldElement(section, fieldKey, field) {
   div.className = "field-item";
   div.dataset.fieldKey = fieldKey;
 
-  div.innerHTML = `
-        <div class="flex items-start gap-2">
-            <!-- Field Content -->
-            <div class="field-label-container">
-                <div class="field-label-display">
-                    <label class="field-label ${
-                      isMandatory ? "mandatory" : ""
-                    }">
-                        ${field.label}
-                    </label>
-                    ${
-                      !isMandatory
-                        ? `
-                        <button type="button" class="btn btn-ghost edit-btn" onclick="editFieldLabel('${section}', '${fieldKey}')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
-                        </button>
-                    `
-                        : ""
-                    }
-                </div>
+    div.innerHTML = `
+      <div class="flex items-start gap-2">
+        <!-- Field Content -->
+        <div class="field-label-container">
+          <div class="field-label-display">
+            <label class="field-label ${isMandatory ? "mandatory" : ""}">
+              ${field.label}
+            </label>
+          </div>
 
-                <!-- Field Input -->
-                <div class="field-input-container">
-                    ${renderFieldInput(section, fieldKey, field)}
-                </div>
-            </div>
+          <!-- Field Input -->
+          <div class="field-input-container">
+            ${renderFieldInput(section, fieldKey, field)}
+          </div>
         </div>
+      </div>
     `;
 
   return div;
@@ -377,55 +363,7 @@ function updateFieldValue(section, fieldKey, value) {
   }
 }
 
-// Edit field label
-function editFieldLabel(section, fieldKey) {
-  const fieldElement = document.querySelector(`[data-field-key="${fieldKey}"]`);
-  if (!fieldElement) return;
-
-  const labelDisplay = fieldElement.querySelector(".field-label-display");
-  const currentLabel = formData[section][fieldKey].label;
-
-  labelDisplay.innerHTML = `
-        <div class="field-label-edit">
-            <input type="text" class="form-input field-label-input" value="${currentLabel}" id="edit-${fieldKey}">
-            <button type="button" class="btn btn-ghost save-btn" onclick="saveFieldLabel('${section}', '${fieldKey}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                    <polyline points="17 21 17 13 7 13 7 21"/>
-                    <polyline points="7 3 7 8 15 8"/>
-                </svg>
-            </button>
-            <button type="button" class="btn btn-ghost cancel-btn" onclick="cancelEditLabel('${section}', '${fieldKey}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-            </button>
-        </div>
-    `;
-
-  document.getElementById(`edit-${fieldKey}`)?.focus();
-}
-
-// Save field label
-function saveFieldLabel(section, fieldKey) {
-  const input = document.getElementById(`edit-${fieldKey}`);
-  if (!input) return;
-
-  const newLabel = input.value.trim();
-  if (newLabel) {
-    formData[section][fieldKey].label = newLabel;
-    renderSection(section);
-    saveToLocalStorage();
-  } else {
-    cancelEditLabel(section, fieldKey);
-  }
-}
-
-// Cancel edit label
-function cancelEditLabel(section, fieldKey) {
-  renderSection(section);
-}
+// Edit field label functionality removed
 
 // Delete field function removed - fields are now permanent
 
@@ -536,6 +474,7 @@ async function submitForm() {
     // Prepare form data
     const formDataToSend = new FormData();
 
+
     // Add all fields
     Object.entries(formData).forEach(([section, fields]) => {
       Object.entries(fields).forEach(([key, field]) => {
@@ -544,6 +483,8 @@ async function submitForm() {
         }
       });
     });
+    // Always set template_choice=1 for free biodata
+    formDataToSend.append('template_choice', '1');
 
     // Add image if present
     if (imageFile) {
@@ -551,7 +492,12 @@ async function submitForm() {
     }
 
     // Submit to API
-    await api.createBiodata(formDataToSend);
+    const result = await api.createBiodata(formDataToSend);
+
+    // Store biodata ID for download
+    if (result && result.id) {
+      localStorage.setItem('biodata_id', result.id);
+    }
 
     // Clear localStorage
     localStorage.removeItem("biodataForm");

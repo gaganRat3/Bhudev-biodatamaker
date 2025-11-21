@@ -1,3 +1,43 @@
+// Send free template to email
+async function sendFreeTemplateToEmail() {
+  const emailInput = document.getElementById('free-email-input');
+  const email = emailInput ? emailInput.value.trim() : '';
+  if (!email) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+  // Get biodata id
+  let biodataId = localStorage.getItem('biodata_id');
+  if (!biodataId && formData && formData.id) {
+    biodataId = formData.id;
+  }
+  if (!biodataId) {
+    alert('Biodata ID not found. Please save your biodata first.');
+    return;
+  }
+  // Call backend endpoint to send email
+  try {
+    const resp = await fetch(`/api/biodata/${biodataId}/send_free_email/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await resp.json();
+    if (resp.ok && data.success) {
+      alert('The free template PDF has been sent to your email!');
+    } else {
+      alert('Failed to send email: ' + (data.error || resp.statusText));
+    }
+  } catch (err) {
+    alert('Error sending email: ' + err.message);
+  }
+}
+
+// Helper: Generate direct PDF download link for a given biodata ID
+function getDirectPDFDownloadLink(biodataId) {
+  if (!biodataId) return '#';
+  return `${window.location.origin}/api/biodata/${biodataId}/download/`;
+}
 // Template Page JavaScript
 // Responsibilities:
 // 1. Load previously prepared biodata (from localStorage 'formDataForTemplate').
@@ -54,21 +94,81 @@ function updateDownloadButton(templateId) {
   const downloadBtn = document.getElementById("download-btn");
 
   if (templateId === 1) {
-    // Free template
+    // Free template: use html2pdf.js to download the preview as PDF (WYSIWYG)
     downloadBtn.className = "btn btn-primary";
-    downloadBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>Download PDF';
+    downloadBtn.disabled = false;
+    downloadBtn.style.display = '';
+    downloadBtn.innerHTML = `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"20\" height=\"20\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /><polyline points=\"7 10 12 15 17 10\" /><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\" /></svg>Download PDF`;
+    downloadBtn.onclick = function() {
+      const element = document.getElementById('template-content');
+      if (!element) {
+        alert('Preview not found.');
+        return;
+      }
+      const opt = {
+        margin:       0,
+        filename:     'biodata.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    };
   } else {
     // Premium template
     downloadBtn.className = "btn download-premium";
     downloadBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Register to Download';
+    downloadBtn.removeAttribute('href');
+    downloadBtn.onclick = handleDownload;
   }
 }
 
 // Handle download based on template type
-function handleDownload() {
+async function handleDownload() {
   if (selectedTemplate === 1) {
-    // Free template - allow direct download
-    downloadPDF();
+    // Free template - download PDF from backend endpoint
+    // Try to get biodata id from localStorage (if available)
+    const saved = localStorage.getItem("biodata_id");
+    let biodataId = null;
+    if (saved) {
+      biodataId = saved;
+    } else if (formData && formData.id) {
+      biodataId = formData.id;
+    }
+    if (!biodataId) {
+      alert("Biodata ID not found. Please save your biodata first.");
+      return;
+    }
+    // Compose backend endpoint URL
+    const url = `${window.location.origin}/api/biodata/${biodataId}/download/`;
+    // Try fetching PDF (backend may return 501 if server cannot generate PDF)
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        // If server returned 501 or other error, fall back to opening HTML view
+        window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+        return;
+      }
+      const blob = await resp.blob();
+      const contentType = resp.headers.get('Content-Type') || '';
+      if (contentType.indexOf('application/pdf') === -1) {
+        // Not a PDF — open HTML fallback
+        window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+        return;
+      }
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `biodata_${biodataId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      }, 100);
+    } catch (err) {
+      // Network/fetch error - open HTML fallback so user can still save via print
+      window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+    }
   } else {
     // Premium template - require registration
     showRegistrationModal();
@@ -137,6 +237,7 @@ async function submitRegistration(event) {
     return;
   }
 
+
   // Prepare FormData for API (serializer expects 'data' JSON string)
   const fd = new FormData();
   const payloadData = {
@@ -165,6 +266,12 @@ async function submitRegistration(event) {
     }
   }
 
+  // Attach payment screenshot if provided
+  const paymentScreenshotInput = document.getElementById("reg-payment-screenshot");
+  if (paymentScreenshotInput && paymentScreenshotInput.files && paymentScreenshotInput.files[0]) {
+    fd.append("payment_screenshot", paymentScreenshotInput.files[0]);
+  }
+
   // Disable UI while submitting
   const submitBtn = document.getElementById("reg-submit");
   submitBtn.disabled = true;
@@ -174,17 +281,19 @@ async function submitRegistration(event) {
     // Create biodata record (will be is_approved=false by default)
     const resp = await api.createBiodata(fd);
 
-    // Show confirmation message to user
-    alert(
-      "Your biodata has been saved! Please wait for admin approval. You’ll receive an email when it’s ready for download."
-    );
+    // Hide registration modal and show confirmation container
+    hideRegistrationModal();
+    document.getElementById("template-gallery").classList.add("hidden");
+    document.getElementById("template-view").classList.add("hidden");
+    const confirmation = document.getElementById("confirmation-container");
+    if (confirmation) confirmation.classList.remove("hidden");
 
     // Optionally update UI: mark download as pending
     const downloadBtn = document.getElementById("download-btn");
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = "Awaiting Approval";
-
-    hideRegistrationModal();
+    if (downloadBtn) {
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = "Awaiting Approval";
+    }
   } catch (err) {
     console.error(err);
     alert("Error saving registration: " + (err.message || err));
@@ -686,6 +795,8 @@ window.handleDownload = handleDownload;
 window.backToGallery = backToGallery;
 window.hideRegistrationModal = hideRegistrationModal;
 window.submitRegistration = submitRegistration;
+
+window.sendFreeTemplateToEmail = sendFreeTemplateToEmail;
 
 // Initialize
 window.addEventListener("DOMContentLoaded", () => {
