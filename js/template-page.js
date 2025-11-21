@@ -1,41 +1,41 @@
 // Send free template to email
 async function sendFreeTemplateToEmail() {
-  const emailInput = document.getElementById('free-email-input');
-  const email = emailInput ? emailInput.value.trim() : '';
+  const emailInput = document.getElementById("free-email-input");
+  const email = emailInput ? emailInput.value.trim() : "";
   if (!email) {
-    alert('Please enter a valid email address.');
+    alert("Please enter a valid email address.");
     return;
   }
   // Get biodata id
-  let biodataId = localStorage.getItem('biodata_id');
+  let biodataId = localStorage.getItem("biodata_id");
   if (!biodataId && formData && formData.id) {
     biodataId = formData.id;
   }
   if (!biodataId) {
-    alert('Biodata ID not found. Please save your biodata first.');
+    alert("Biodata ID not found. Please save your biodata first.");
     return;
   }
   // Call backend endpoint to send email
   try {
     const resp = await fetch(`/api/biodata/${biodataId}/send_free_email/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
     });
     const data = await resp.json();
     if (resp.ok && data.success) {
-      alert('The free template PDF has been sent to your email!');
+      alert("The free template PDF has been sent to your email!");
     } else {
-      alert('Failed to send email: ' + (data.error || resp.statusText));
+      alert("Failed to send email: " + (data.error || resp.statusText));
     }
   } catch (err) {
-    alert('Error sending email: ' + err.message);
+    alert("Error sending email: " + err.message);
   }
 }
 
 // Helper: Generate direct PDF download link for a given biodata ID
 function getDirectPDFDownloadLink(biodataId) {
-  if (!biodataId) return '#';
+  if (!biodataId) return "#";
   return `${window.location.origin}/api/biodata/${biodataId}/download/`;
 }
 // Template Page JavaScript
@@ -93,32 +93,64 @@ function selectTemplate(templateId) {
 function updateDownloadButton(templateId) {
   const downloadBtn = document.getElementById("download-btn");
 
+  const exportBtn = document.getElementById("export-pdf-btn");
   if (templateId === 1) {
-    // Free template: use html2pdf.js to download the preview as PDF (WYSIWYG)
+    // Free template: show export button and set up both buttons
     downloadBtn.className = "btn btn-primary";
     downloadBtn.disabled = false;
-    downloadBtn.style.display = '';
+    downloadBtn.style.display = "";
     downloadBtn.innerHTML = `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"20\" height=\"20\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /><polyline points=\"7 10 12 15 17 10\" /><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\" /></svg>Download PDF`;
-    downloadBtn.onclick = function() {
-      const element = document.getElementById('template-content');
+    downloadBtn.onclick = function () {
+      const element = document.getElementById("template-content");
       if (!element) {
-        alert('Preview not found.');
+        alert("Preview not found.");
         return;
       }
       const opt = {
-        margin:       0,
-        filename:     'biodata.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+        margin: 0,
+        filename: "biodata.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
       };
       html2pdf().set(opt).from(element).save();
     };
+    if (exportBtn) {
+      exportBtn.style.display = "";
+      exportBtn.onclick = function () {
+        const element = document.getElementById("template-content");
+        if (!element) {
+          alert("Preview not found.");
+          return;
+        }
+        // Mobile detection
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          );
+        const opt = {
+          margin: 0,
+          filename: "biodata_export.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+        };
+        if (isMobile) {
+          // Always force download on mobile
+          html2pdf().set(opt).from(element).save();
+        } else {
+          // On desktop, default to download as well (can be customized if needed)
+          html2pdf().set(opt).from(element).save();
+        }
+      };
+    }
   } else {
-    // Premium template
+    // Premium template: hide export button
+    if (exportBtn) exportBtn.style.display = "none";
     downloadBtn.className = "btn download-premium";
-    downloadBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Register to Download';
-    downloadBtn.removeAttribute('href');
+    downloadBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Register to Download';
+    downloadBtn.removeAttribute("href");
     downloadBtn.onclick = handleDownload;
   }
 }
@@ -146,17 +178,23 @@ async function handleDownload() {
       const resp = await fetch(url);
       if (!resp.ok) {
         // If server returned 501 or other error, fall back to opening HTML view
-        window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+        window.open(
+          `${window.location.origin}/api/download/${biodataId}/`,
+          "_blank"
+        );
         return;
       }
       const blob = await resp.blob();
-      const contentType = resp.headers.get('Content-Type') || '';
-      if (contentType.indexOf('application/pdf') === -1) {
+      const contentType = resp.headers.get("Content-Type") || "";
+      if (contentType.indexOf("application/pdf") === -1) {
         // Not a PDF — open HTML fallback
-        window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+        window.open(
+          `${window.location.origin}/api/download/${biodataId}/`,
+          "_blank"
+        );
         return;
       }
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
       link.download = `biodata_${biodataId}.pdf`;
       document.body.appendChild(link);
@@ -167,7 +205,10 @@ async function handleDownload() {
       }, 100);
     } catch (err) {
       // Network/fetch error - open HTML fallback so user can still save via print
-      window.open(`${window.location.origin}/api/download/${biodataId}/`, '_blank');
+      window.open(
+        `${window.location.origin}/api/download/${biodataId}/`,
+        "_blank"
+      );
     }
   } else {
     // Premium template - require registration
@@ -237,7 +278,6 @@ async function submitRegistration(event) {
     return;
   }
 
-
   // Prepare FormData for API (serializer expects 'data' JSON string)
   const fd = new FormData();
   const payloadData = {
@@ -267,8 +307,14 @@ async function submitRegistration(event) {
   }
 
   // Attach payment screenshot if provided
-  const paymentScreenshotInput = document.getElementById("reg-payment-screenshot");
-  if (paymentScreenshotInput && paymentScreenshotInput.files && paymentScreenshotInput.files[0]) {
+  const paymentScreenshotInput = document.getElementById(
+    "reg-payment-screenshot"
+  );
+  if (
+    paymentScreenshotInput &&
+    paymentScreenshotInput.files &&
+    paymentScreenshotInput.files[0]
+  ) {
     fd.append("payment_screenshot", paymentScreenshotInput.files[0]);
   }
 
@@ -349,7 +395,9 @@ function renderTemplate(templateId) {
 
   // Helper: produce section element with two-column split.
   function buildSection(title, obj) {
-    const entries = Object.entries(obj || {}).filter(([, v]) => v && String(v).trim());
+    const entries = Object.entries(obj || {}).filter(
+      ([, v]) => v && String(v).trim()
+    );
     if (!entries.length) return null;
     const sectionEl = document.createElement("div");
     sectionEl.className = "biodata-section";
@@ -404,7 +452,10 @@ function renderTemplate(templateId) {
   if (personal) biodataContent.appendChild(personal);
   const family = buildSection("Family Details", formData.FamilyDetails);
   if (family) biodataContent.appendChild(family);
-  const habits = buildSection("Habits & Declaration", formData.HabitsDeclaration);
+  const habits = buildSection(
+    "Habits & Declaration",
+    formData.HabitsDeclaration
+  );
   if (habits) biodataContent.appendChild(habits);
 
   // Render.
@@ -438,11 +489,13 @@ function downloadPDF() {
   }
 
   // Use mapping (fallback to element computed style if missing).
-  const borderImagePath = TEMPLATE_BORDER_IMAGES[selectedTemplate] || (() => {
-    const bg = window.getComputedStyle(element).backgroundImage;
-    const match = bg && bg.match(/url\(["']?([^"']+)["']?\)/);
-    return match ? match[1] : TEMPLATE_BORDER_IMAGES[1];
-  })();
+  const borderImagePath =
+    TEMPLATE_BORDER_IMAGES[selectedTemplate] ||
+    (() => {
+      const bg = window.getComputedStyle(element).backgroundImage;
+      const match = bg && bg.match(/url\(["']?([^"']+)["']?\)/);
+      return match ? match[1] : TEMPLATE_BORDER_IMAGES[1];
+    })();
 
   const pdfWindow = window.open("", "_blank");
   if (!pdfWindow) {
@@ -707,7 +760,9 @@ function renderTemplate5(container) {
   }
 
   function section5(titleText, obj) {
-    const entries = Object.entries(obj || {}).filter(([, v]) => v && String(v).trim());
+    const entries = Object.entries(obj || {}).filter(
+      ([, v]) => v && String(v).trim()
+    );
     if (!entries.length) return;
     const title = document.createElement("div");
     title.textContent = titleText.toUpperCase();
@@ -726,10 +781,13 @@ function renderTemplate5(container) {
       const val = document.createElement("div");
       val.textContent = v;
       val.style.cssText = `color:#000;`;
-      item.appendChild(lab);item.appendChild(val);
+      item.appendChild(lab);
+      item.appendChild(val);
       (i % 2 === 0 ? c1 : c2).appendChild(item);
     });
-    grid.appendChild(c1);grid.appendChild(c2);left.appendChild(grid);
+    grid.appendChild(c1);
+    grid.appendChild(c2);
+    left.appendChild(grid);
   }
 
   section5("Personal Details", formData?.PersonalDetails);

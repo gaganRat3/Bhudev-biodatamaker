@@ -9,26 +9,75 @@
   <body class="bg-gray-50 min-h-screen p-4">
     <div class="container max-w-6xl mx-auto">
       <!-- Confirmation Page (hidden by default) -->
-      <div id="confirmation-container" class="hidden flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl shadow-2xl p-10 mt-16 border border-gray-200 animate-fade-in">
+      <div
+        id="confirmation-container"
+        class="hidden flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl shadow-2xl p-10 mt-16 border border-gray-200 animate-fade-in"
+      >
         <div class="flex flex-col items-center">
-          <div class="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4 shadow">
-            <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="text-green-500">
-              <circle cx="12" cy="12" r="11" stroke="#22c55e" stroke-width="2" fill="#e7fbe9" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 13l3 3 7-7" stroke="#22c55e" stroke-width="2.5"/>
+          <div
+            class="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4 shadow"
+          >
+            <svg
+              width="48"
+              height="48"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+              class="text-green-500"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="11"
+                stroke="#22c55e"
+                stroke-width="2"
+                fill="#e7fbe9"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7 13l3 3 7-7"
+                stroke="#22c55e"
+                stroke-width="2.5"
+              />
             </svg>
           </div>
-          <h2 class="text-3xl font-extrabold text-gray-800 mb-2 tracking-tight">Thank you for your submission!</h2>
-          <p class="text-lg text-gray-500 mb-6 text-center max-w-md">Your biodata request has been received.<br>Once we approve, you will get your biodata in your <span class="font-semibold text-green-600">Gmail</span>.</p>
-          <a href="index.html" style="margin-top: 24px; display: inline-block; min-width: 180px; text-align: center; color: green;" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-lg">Back to Home</a>
+          <h2 class="text-3xl font-extrabold text-gray-800 mb-2 tracking-tight">
+            Thank you for your submission!
+          </h2>
+          <p class="text-lg text-gray-500 mb-6 text-center max-w-md">
+            Your biodata request has been received.<br />Once we approve, you
+            will get your biodata in your
+            <span class="font-semibold text-green-600">Gmail</span>.
+          </p>
+          <a
+            href="index.html"
+            style="
+              margin-top: 24px;
+              display: inline-block;
+              min-width: 180px;
+              text-align: center;
+              color: green;
+            "
+            class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-lg"
+            >Back to Home</a
+          >
         </div>
       </div>
       <style>
         .animate-fade-in {
-          animation: fadeInScale 0.7s cubic-bezier(0.4,0,0.2,1);
+          animation: fadeInScale 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes fadeInScale {
-          0% { opacity: 0; transform: scale(0.95); }
-          100% { opacity: 1; transform: scale(1); }
+          0% {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
       </style>
       <!-- Template Gallery -->
@@ -154,7 +203,9 @@
         <!-- Template Content renders directly here without container -->
         <div id="template-content"></div>
 
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <div
+          style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"
+        >
           <button
             onclick="handleDownload()"
             class="btn btn-primary"
@@ -173,6 +224,24 @@
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             Download PDF
+          </button>
+          <button
+            id="export-pdf-btn"
+            class="btn btn-success"
+            style="display: none"
+            type="button"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              width="20"
+              height="20"
+            >
+              <path d="M12 19V6M5 12l7 7 7-7" />
+            </svg>
+            Export PDF
           </button>
         </div>
       </div>
@@ -234,21 +303,29 @@
               placeholder="Optional phone number"
             />
           </div>
-            <div class="form-group">
-              <label class="form-label">QR Image</label>
-              <div style="padding: 8px 0;">
-                <img src="assets/your-qr-image.png" alt="QR Code" style="max-width: 180px; border: 1px solid #ccc; border-radius: 8px;" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Upload Payment Screenshot</label>
-              <input
-                id="reg-payment-screenshot"
-                class="form-input"
-                type="file"
-                accept="image/*"
+          <div class="form-group">
+            <label class="form-label">QR Image</label>
+            <div style="padding: 8px 0">
+              <img
+                src="assets/your-qr-image.png"
+                alt="QR Code"
+                style="
+                  max-width: 180px;
+                  border: 1px solid #ccc;
+                  border-radius: 8px;
+                "
               />
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Upload Payment Screenshot</label>
+            <input
+              id="reg-payment-screenshot"
+              class="form-input"
+              type="file"
+              accept="image/*"
+            />
+          </div>
           <div
             style="
               display: flex;
@@ -342,7 +419,6 @@
         position: relative;
         z-index: 1;
       }
-
 
       /* Paid template styling */
       .paid-template {
@@ -517,7 +593,7 @@
       }
 
       .detail-columns::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 50%;
         top: 0;
