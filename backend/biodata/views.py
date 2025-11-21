@@ -1,3 +1,4 @@
+## Removed send_free_email_view: free PDF will not send email. Premium logic untouched.
 from rest_framework import viewsets
 from .models import Biodata
 from .serializers import BiodataSerializer
@@ -5,34 +6,8 @@ from .serializers import BiodataSerializer
 from django.shortcuts import render, get_object_or_404
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.http import HttpResponseForbidden
-from django.http import HttpResponse, Http404
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
-def biodata_pdf_download_view(request, pk):
-    """Generate and serve a PDF for the given Biodata (free template download)."""
-    from .models import Biodata
-    try:
-        obj = Biodata.objects.get(pk=pk)
-    except Biodata.DoesNotExist:
-        raise Http404("Biodata not found")
-
-    # Only allow download for free templates (e.g., template_choice 1-4)
-    if str(obj.template_choice) not in {"1", "2", "3", "4"}:
-        return HttpResponseForbidden("PDF download only allowed for free templates.")
-
-    # Generate frontend-style HTML
-    html_content = BiodataAdmin.build_frontend_html(BiodataAdmin, obj)
-
-    # Convert to PDF using Playwright
-    try:
-        from .admin import BiodataAdmin
-        pdf_buffer = BiodataAdmin.html_to_pdf_playwright(BiodataAdmin, html_content)
-    except Exception as e:
-        return HttpResponse(f"PDF generation failed: {e}", status=500)
-
-    response = HttpResponse(pdf_buffer.read(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="biodata_{obj.pk}.pdf"'
-    return response
+from django.http import HttpResponse, HttpResponseServerError
+from django.template.loader import render_to_string
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
@@ -66,6 +41,85 @@ def biodata_download_view(request, pk, token):
     # that triggers the browser print dialog so the user can save a PDF.
     # The template uses the project's frontend assets (css, assets) which are
     # already exposed via STATICFILES_DIRS / Django static serving in DEBUG.
+    return render(request, "biodata_download.html", {"biodata": biodata})
+
+
+def biodata_pdf_view(request, pk):
+    """Generate PDF for an approved biodata.
+
+    This view tries to use WeasyPrint to render the biodata HTML into a PDF
+    and return it with Content-Disposition: attachment so the browser downloads
+    it directly. If WeasyPrint isn't installed, return 501 so the frontend can
+    fall back to the HTML-based flow.
+    """
+    biodata = get_object_or_404(Biodata, pk=pk)
+    if not biodata.is_approved:
+        return HttpResponseForbidden("Biodata not approved yet")
+
+
+    # Determine border image path (match frontend logic)
+    border_map = {
+        '1': '/assets/border/White.png',
+        '2': '/assets/border/bg0.png',
+        '3': '/assets/border/bg3.jpg',
+        '4': '/assets/border/bg8.jpg',
+        '5': '/assets/border/bg9.jpg',
+    }
+    border_image_path = border_map.get(str(biodata.template_choice or '1'), '/assets/border/White.png')
+
+    # Profile image path (if present)
+    profile_image_path = biodata.profile_image.url if biodata.profile_image else None
+
+    # Split fields into two columns for each section (like frontend)
+    def split_dict(d):
+        if not d:
+            return [], []
+        items = list(d.items())
+        mid = (len(items) + 1) // 2
+        return items[:mid], items[mid:]
+
+    personal_left, personal_right = split_dict(biodata.data.get('PersonalDetails', {}))
+    family_left, family_right = split_dict(biodata.data.get('FamilyDetails', {}))
+    habits_left, habits_right = split_dict(biodata.data.get('HabitsDeclaration', {}))
+
+    context = {
+        "biodata": biodata,
+        "border_image_path": border_image_path,
+        "profile_image_path": profile_image_path,
+        "personal_left": personal_left,
+        "personal_right": personal_right,
+        "family_left": family_left,
+        "family_right": family_right,
+        "habits_left": habits_left,
+        "habits_right": habits_right,
+    }
+    try:
+        html = render_to_string("biodata_download.html", context)
+    except Exception as e:
+        return HttpResponseServerError(f"Error rendering template: {e}")
+
+    try:
+        # Import WeasyPrint lazily; if not installed we signal backend doesn't support PDF
+        from weasyprint import HTML
+
+        pdf = HTML(string=html, base_url=request.build_absolute_uri('/')).write_pdf()
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="biodata_{biodata.pk}.pdf"'
+        return response
+    except ImportError:
+        return HttpResponse("PDF generation not available on server.", status=501)
+    except Exception as e:
+        return HttpResponseServerError(f"PDF generation failed: {e}")
+
+
+def biodata_html_view(request, pk):
+    """Render the biodata download HTML page (no token). This is a friendly
+    fallback that the frontend opens when server-side PDF generation isn't
+    available. It behaves like the tokenized view but doesn't require a token.
+    """
+    biodata = get_object_or_404(Biodata, pk=pk)
+    if not biodata.is_approved:
+        return HttpResponseForbidden("Biodata not approved yet")
     return render(request, "biodata_download.html", {"biodata": biodata})
 
 
