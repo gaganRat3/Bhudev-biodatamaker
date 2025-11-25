@@ -79,8 +79,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'CHANGE_ME_TO_A_SECURE_RANDOM_KEY'
 DEBUG = True
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = [
+    'keyla-mirier-pebbly.ngrok-free.dev',
+    'www.keyla-mirier-pebbly.ngrok-free.dev',
+    'localhost',
+    '127.0.0.1'
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -154,8 +158,12 @@ STATICFILES_DIRS = [
     BASE_DIR.parent / 'assets',
 ]
 
-# Allow CORS from the frontend during development
-CORS_ALLOW_ALL_ORIGINS = True
+
+# Allow CORS from the frontend during development and ngrok
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://keyla-mirier-pebbly.ngrok-free.dev',
+]
 
 # Django REST Framework
 REST_FRAMEWORK = {
