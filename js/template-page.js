@@ -106,6 +106,29 @@ function updateDownloadButton(templateId) {
         alert("Preview not found.");
         return;
       }
+      // Mobile detection
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      let wrapper = null;
+      if (isMobile) {
+        // Create a flexbox wrapper for centering
+        wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.justifyContent = "center";
+        wrapper.style.alignItems = "center";
+        wrapper.style.height = "100vh";
+        wrapper.style.width = "100vw";
+        wrapper.style.margin = "auto";
+        // Set content width to A4 size and center
+        element.style.width = "595pt";
+        element.style.maxWidth = "595pt";
+        element.style.margin = "auto";
+        // Move template-content into wrapper
+        element.parentNode.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+      }
       const opt = {
         margin: 0,
         filename: "biodata.pdf",
@@ -113,7 +136,20 @@ function updateDownloadButton(templateId) {
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
       };
-      html2pdf().set(opt).from(element).save();
+      window.scrollTo(0, 0);
+      html2pdf()
+        .set(opt)
+        .from(isMobile ? wrapper : element)
+        .save()
+        .then(() => {
+          // Restore DOM after export
+          if (isMobile && wrapper) {
+            wrapper.parentNode.insertBefore(element, wrapper);
+            wrapper.parentNode.removeChild(wrapper);
+            element.style.width = "";
+            element.style.maxWidth = "";
+          }
+        });
     };
     if (exportBtn) {
       exportBtn.style.display = "";
@@ -128,6 +164,24 @@ function updateDownloadButton(templateId) {
           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
             navigator.userAgent
           );
+        let wrapper = null;
+        if (isMobile) {
+          // Create a flexbox wrapper for centering
+          wrapper = document.createElement("div");
+          wrapper.style.display = "flex";
+          wrapper.style.justifyContent = "center";
+          wrapper.style.alignItems = "center";
+          wrapper.style.height = "100vh";
+          wrapper.style.width = "100vw";
+          wrapper.style.margin = "auto";
+          // Set content width to A4 size and center
+          element.style.width = "595pt";
+          element.style.maxWidth = "595pt";
+          element.style.margin = "auto";
+          // Move template-content into wrapper
+          element.parentNode.insertBefore(wrapper, element);
+          wrapper.appendChild(element);
+        }
         const opt = {
           margin: 0,
           filename: "biodata_export.pdf",
@@ -135,13 +189,20 @@ function updateDownloadButton(templateId) {
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
         };
-        if (isMobile) {
-          // Always force download on mobile
-          html2pdf().set(opt).from(element).save();
-        } else {
-          // On desktop, default to download as well (can be customized if needed)
-          html2pdf().set(opt).from(element).save();
-        }
+        window.scrollTo(0, 0);
+        html2pdf()
+          .set(opt)
+          .from(isMobile ? wrapper : element)
+          .save()
+          .then(() => {
+            // Restore DOM after export
+            if (isMobile && wrapper) {
+              wrapper.parentNode.insertBefore(element, wrapper);
+              wrapper.parentNode.removeChild(wrapper);
+              element.style.width = "";
+              element.style.maxWidth = "";
+            }
+          });
       };
     }
   } else {
@@ -539,6 +600,22 @@ function downloadPDF() {
           color-adjust: exact !important;
           print-color-adjust: exact !important;
           page-break-inside: avoid !important;
+        }
+        @media (max-width: 600px) {
+          body {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            min-height: 100vh !important;
+          }
+          #template-content {
+            width: 90vw !important;
+            max-width: 90vw !important;
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            display: block !important;
+          }
         }
         
         /* Biodata content styling matching screenshot */

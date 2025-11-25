@@ -515,6 +515,17 @@ body {
   }
 }
 
+@media (max-width: 600px) {
+  .pdf-template {
+    width: 100vw !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
 /* Logo transparency styles */
 .logo-transparent {
   background: transparent !important;
