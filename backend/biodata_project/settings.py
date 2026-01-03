@@ -74,18 +74,18 @@ if not EMAIL_HOST_PASSWORD and EMAIL_BACKEND == 'django.core.mail.backends.smtp.
     )
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'noreply@yourdomain.com')
- 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'CHANGE_ME_TO_A_SECURE_RANDOM_KEY'
 DEBUG = True
 ALLOWED_HOSTS = [
+    'biodata-maker-bhudevnetwork.pythonanywhere.com',  # PythonAnywhere converts underscores to hyphens
     'keyla-mirier-pebbly.ngrok-free.dev',
     'www.keyla-mirier-pebbly.ngrok-free.dev',
     'localhost',
     '127.0.0.1'
 ]
 INSTALLED_APPS = [
+    'grappelli',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,11 +152,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # During development, serve the frontend's css/js/assets via Django staticfiles
 # without changing the existing HTML paths.
+# Note: Comment out STATICFILES_DIRS when running collectstatic to avoid conflicts
 STATICFILES_DIRS = [
     BASE_DIR.parent / 'css',
     BASE_DIR.parent / 'js',
     BASE_DIR.parent / 'assets',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Allow CORS from the frontend during development and ngrok

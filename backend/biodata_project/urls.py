@@ -7,6 +7,7 @@ from pathlib import Path
 from .views import serve_static_html
 
 urlpatterns = [
+    path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     path('admin/', admin.site.urls),
     path('api/', include('biodata.urls')),
     # Frontend pages served as static HTML (no Django template processing)
