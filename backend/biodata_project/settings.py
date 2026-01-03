@@ -62,7 +62,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'bhudevnetwork@gmail.com')
 # ⚠️ SECURITY: Never hardcode passwords! Use environment variables
 # For Gmail: You MUST use an App Password (not regular password)
 # Generate App Password: https://myaccount.google.com/apppasswords
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'dnlu ghtb riut wkit')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'iptc qxhi rfir pxex')
 
 # If password is not set, log a warning
 if not EMAIL_HOST_PASSWORD and EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':

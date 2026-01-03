@@ -59,9 +59,13 @@ const TEMPLATE_BORDER_IMAGES = {
   // If backend adds choice 6 later, it would be bg10.jpg (not currently selectable here)
 };
 
-// Load form data from localStorage
+// Load form data from localStorage or sessionStorage
 function loadFormData() {
-  const saved = localStorage.getItem("formDataForTemplate");
+  let saved = localStorage.getItem("formDataForTemplate");
+  if (!saved) {
+    // Check sessionStorage as fallback
+    saved = sessionStorage.getItem("formDataForTemplate");
+  }
   if (!saved) {
     alert("No biodata data found. Please create a biodata first.");
     window.location.href = "biodata-form.html";
@@ -322,7 +326,10 @@ async function submitRegistration(event) {
   );
 
   // Build payload from existing local formDataForTemplate
-  const saved = localStorage.getItem("formDataForTemplate");
+  let saved = localStorage.getItem("formDataForTemplate");
+  if (!saved) {
+    saved = sessionStorage.getItem("formDataForTemplate");
+  }
   if (!saved) {
     alert("No biodata found in your browser. Please create biodata first.");
     hideRegistrationModal();

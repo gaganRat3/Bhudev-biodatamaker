@@ -208,13 +208,25 @@ class BiodataAdmin(admin.ModelAdmin):
         
         # Format sections - Split items into left/right columns
         def format_section_items(details_dict):
-            items = [(k, v) for k, v in (details_dict or {}).items() if v and str(v).strip()]
+            items = []
+            for k, v in (details_dict or {}).items():
+                # Handle both old format (direct values) and new format ({label, value})
+                if isinstance(v, dict) and 'value' in v:
+                    actual_value = v.get('value', '')
+                    label_text = v.get('label', k.replace('_', ' ').title())
+                else:
+                    actual_value = v
+                    label_text = k.replace('_', ' ').title()
+                
+                # Only include non-empty values
+                if actual_value and str(actual_value).strip():
+                    items.append((label_text, actual_value))
+            
             left_html = ""
             right_html = ""
-            for i, (key, value) in enumerate(items):
-                key_title = key.replace('_', ' ').title()
+            for i, (label, value) in enumerate(items):
                 item = f'''<div class="detail-item">
-                    <span class="detail-label">{key_title}</span>
+                    <span class="detail-label">{label}</span>
                     <span class="detail-value">{value}</span>
                 </div>'''
                 if i % 2 == 0:
@@ -227,8 +239,12 @@ class BiodataAdmin(admin.ModelAdmin):
         family_html = format_section_items(family)
         habits_html = format_section_items(habits)
         
-        # Get name from PersonalDetails instead of user_name
-        display_name = personal.get('name', '') or personal.get('Name', '') or obj.user_name or ''
+        # Get name from PersonalDetails instead of user_name (handle both formats)
+        name_field = personal.get('name', '') or personal.get('Name', '')
+        if isinstance(name_field, dict) and 'value' in name_field:
+            display_name = name_field.get('value', '') or obj.user_name or ''
+        else:
+            display_name = name_field or obj.user_name or ''
         
         html = f'''<!DOCTYPE html>
 <html lang="en">
@@ -377,20 +393,37 @@ class BiodataAdmin(admin.ModelAdmin):
 
     def generate_template5_html(self, obj, border_image_base64, profile_image_base64, personal, family, habits):
         """Generate frontend-matching HTML for Template 5 (matches frontend: red border, blue section headers, Om symbol, BIO DATA, right-side profile photo, two-column layout)"""
-        display_name = personal.get('name', '') or personal.get('Name', '') or obj.user_name or ''
+        # Get name from PersonalDetails (handle both formats)
+        name_field = personal.get('name', '') or personal.get('Name', '')
+        if isinstance(name_field, dict) and 'value' in name_field:
+            display_name = name_field.get('value', '') or obj.user_name or ''
+        else:
+            display_name = name_field or obj.user_name or ''
         # Profile image HTML (right-side, rectangular)
         if profile_image_base64:
             profile_html = f'<img src="{profile_image_base64}" style="width:150px;height:180px;object-fit:cover;border:2px solid #000;margin-bottom:20px;display:block;" alt="Profile" />'
         else:
             profile_html = '<div style="width:150px;height:180px;background:#f0f0f0;border:2px solid #000;display:flex;align-items:center;justify-content:center;color:#666;font-size:12px;text-align:center;margin-bottom:20px;">Profile<br>Photo</div>'
         def format_section_items(details_dict):
-            items = [(k, v) for k, v in (details_dict or {}).items() if v and str(v).strip()]
+            items = []
+            for k, v in (details_dict or {}).items():
+                # Handle both old format (direct values) and new format ({label, value})
+                if isinstance(v, dict) and 'value' in v:
+                    actual_value = v.get('value', '')
+                    label_text = v.get('label', k.replace('_', ' ').title())
+                else:
+                    actual_value = v
+                    label_text = k.replace('_', ' ').title()
+                
+                # Only include non-empty values
+                if actual_value and str(actual_value).strip():
+                    items.append((label_text, actual_value))
+            
             left_html = ""
             right_html = ""
-            for i, (key, value) in enumerate(items):
-                key_title = key.replace('_', ' ').title()
+            for i, (label, value) in enumerate(items):
                 item = f'''<div style="margin-bottom:8px;font-size:12px;line-height:1.4;">
-                    <div style="color:#4169e1;margin-bottom:2px;font-weight:bold;">{key_title}</div>
+                    <div style="color:#4169e1;margin-bottom:2px;font-weight:bold;">{label}</div>
                     <div style="color:#000;">{value}</div>
                 </div>'''
                 if i % 2 == 0:

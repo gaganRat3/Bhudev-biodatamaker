@@ -435,10 +435,19 @@ function setupImageUpload() {
   input.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (limit to 2MB for localStorage compatibility)
+      const maxSize = 2 * 1024 * 1024; // 2MB
+      if (file.size > maxSize) {
+        alert('Image is too large. Please choose an image smaller than 2MB.');
+        input.value = ''; // Clear the input
+        return;
+      }
+      
       imageFile = file;
       imagePreview = await fileToBase64(file);
       showImagePreview(imagePreview);
-      saveToLocalStorage();
+      // Don't auto-save after image upload to avoid quota issues
+      // The image will be uploaded directly when form is submitted
     }
   });
 }
@@ -503,28 +512,46 @@ async function submitForm() {
     localStorage.removeItem("biodataForm");
 
     // Redirect to template page with data
-    localStorage.setItem(
-      "formDataForTemplate",
-      JSON.stringify({
-        PersonalDetails: Object.fromEntries(
-          Object.entries(formData.PersonalDetails).map(([k, v]) => [k, v.value])
-        ),
-        FamilyDetails: Object.fromEntries(
-          Object.entries(formData.FamilyDetails).map(([k, v]) => [k, v.value])
-        ),
-        HabitsDeclaration: Object.fromEntries(
-          Object.entries(formData.HabitsDeclaration).map(([k, v]) => [
-            k,
-            v.value,
-          ])
-        ),
-        imagePreview,
-      })
-    );
+    const dataToStore = {
+      PersonalDetails: Object.fromEntries(
+        Object.entries(formData.PersonalDetails).map(([k, v]) => [k, v.value])
+      ),
+      FamilyDetails: Object.fromEntries(
+        Object.entries(formData.FamilyDetails).map(([k, v]) => [k, v.value])
+      ),
+      HabitsDeclaration: Object.fromEntries(
+        Object.entries(formData.HabitsDeclaration).map(([k, v]) => [
+          k,
+          v.value,
+        ])
+      ),
+      imagePreview,
+    };
+
+    // Try localStorage first, fallback to sessionStorage if quota exceeded
+    try {
+      localStorage.setItem("formDataForTemplate", JSON.stringify(dataToStore));
+    } catch (quotaError) {
+      console.log("localStorage quota exceeded, using sessionStorage instead");
+      try {
+        sessionStorage.setItem("formDataForTemplate", JSON.stringify(dataToStore));
+      } catch (sessionError) {
+        console.error("Both localStorage and sessionStorage failed:", sessionError);
+        // Store without image as last resort
+        const dataWithoutImage = { ...dataToStore, imagePreview: null };
+        sessionStorage.setItem("formDataForTemplate", JSON.stringify(dataWithoutImage));
+      }
+    }
 
     window.location.href = "template-page.html";
   } catch (error) {
-    alert("Error submitting form: " + error.message);
+    // Only show error if it's not a storage quota issue
+    if (error.name !== 'QuotaExceededError') {
+      alert("Error submitting form: " + error.message);
+    } else {
+      console.log("Storage quota exceeded, data saved to session");
+      window.location.href = "template-page.html";
+    }
     submitBtn.disabled = false;
     submitBtn.textContent = "Generate Biodata";
   }
@@ -532,14 +559,35 @@ async function submitForm() {
 
 // Save to localStorage
 function saveToLocalStorage() {
-  localStorage.setItem(
-    "biodataForm",
-    JSON.stringify({
-      formData,
-      fieldOrder,
-      imagePreview,
-    })
-  );
+  try {
+    localStorage.setItem(
+      "biodataForm",
+      JSON.stringify({
+        formData,
+        fieldOrder,
+        imagePreview,
+      })
+    );
+  } catch (error) {
+    if (error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded. Saving without image preview.');
+      // Try saving without the large base64 image
+      try {
+        localStorage.setItem(
+          "biodataForm",
+          JSON.stringify({
+            formData,
+            fieldOrder,
+            imagePreview: null, // Don't save the large base64 in auto-save
+          })
+        );
+      } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+      }
+    } else {
+      console.error('Error saving to localStorage:', error);
+    }
+  }
 }
 
 // Setup auto-save

@@ -3,9 +3,12 @@
 let formData = null;
 let selectedTemplate = null;
 
-// Load form data from localStorage
+// Load form data from localStorage or sessionStorage
 function loadFormData() {
-  const saved = localStorage.getItem("formDataForTemplate");
+  let saved = localStorage.getItem("formDataForTemplate");
+  if (!saved) {
+    saved = sessionStorage.getItem("formDataForTemplate");
+  }
   if (saved) {
     try {
       formData = JSON.parse(saved);
@@ -127,7 +130,10 @@ async function submitRegistration(event) {
   localStorage.setItem("templateRegistration", JSON.stringify({ name, email, phone }));
 
   // Build payload from existing local formDataForTemplate
-  const saved = localStorage.getItem("formDataForTemplate");
+  let saved = localStorage.getItem("formDataForTemplate");
+  if (!saved) {
+    saved = sessionStorage.getItem("formDataForTemplate");
+  }
   if (!saved) {
     alert("No biodata found in your browser. Please create biodata first.");
     hideRegistrationModal();
