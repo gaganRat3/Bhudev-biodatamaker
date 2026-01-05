@@ -408,6 +408,13 @@ async function submitRegistration(event) {
       downloadBtn.disabled = true;
       downloadBtn.textContent = "Awaiting Approval";
     }
+
+    // Automatically generate and send PDF after registration
+    if (email) {
+      setTimeout(() => {
+        autoGenerateAndSendPDF(email);
+      }, 1000); // slight delay to ensure DOM updates
+    }
   } catch (err) {
     console.error(err);
     alert("Error saving registration: " + (err.message || err));
@@ -939,6 +946,30 @@ window.hideRegistrationModal = hideRegistrationModal;
 window.submitRegistration = submitRegistration;
 
 window.sendFreeTemplateToEmail = sendFreeTemplateToEmail;
+
+// Automatically generate and upload PDF after approval
+async function autoGenerateAndSendPDF(email) {
+  const element = document.getElementById("template-content");
+  if (!element || !email) return;
+  const opt = {
+    margin: 0,
+    filename: "biodata.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+  };
+  // Generate PDF as Blob
+  const pdfBlob = await html2pdf().set(opt).from(element).outputPdf("blob");
+  // Prepare FormData
+  const formData = new FormData();
+  formData.append("pdf", pdfBlob, "biodata.pdf");
+  formData.append("email", email);
+  // Send to backend
+  fetch("/api/upload_pdf_and_send_email/", {
+    method: "POST",
+    body: formData,
+  });
+}
 
 // Initialize
 window.addEventListener("DOMContentLoaded", () => {

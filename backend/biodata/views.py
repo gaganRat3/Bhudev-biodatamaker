@@ -14,6 +14,31 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.files.base import ContentFile
+from django.core.mail import EmailMessage
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+@permission_classes([AllowAny])
+def upload_pdf_and_send_email(request):
+    """
+    Receives a PDF file and email address, then sends the PDF as an attachment.
+    Expects 'pdf' (file) and 'email' (string) in the POST data.
+    """
+    pdf_file = request.FILES.get('pdf')
+    email_address = request.data.get('email')
+    if not pdf_file or not email_address:
+        return Response({'error': 'PDF file and email are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        email = EmailMessage(
+            subject="Your Biodata PDF is Attached!",
+            body="Dear user,\n\nYour biodata PDF is attached as requested.",
+            to=[email_address]
+        )
+        email.attach(pdf_file.name, pdf_file.read(), 'application/pdf')
+        email.send()
+        return Response({'success': True}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class DownloadSigner(TimestampSigner):

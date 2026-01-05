@@ -53,10 +53,14 @@
       .detail-columns {
         margin-top: 8px;
       }
+      .detail-columns {
+        display: flex;
+        gap: 4%;
+        margin-top: 8px;
+      }
       .detail-columns .col {
-        float: left;
-        width: 48%;
-        margin-right: 4%;
+        flex: 1 1 0;
+        margin-right: 0;
       }
       .detail-columns .col:last-child { margin-right: 0; }
 
@@ -99,10 +103,26 @@
         margin-right: 0; 
       }
       .detail-item {
-        display: block;
-        padding: 6px 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
         border-bottom: 1px dotted #2563eb;
-        margin-bottom: 4px;
+        min-height: 32px;
+        font-size: 1rem;
+        max-width: 100%;
+      }
+      .detail-item > div:first-child {
+        font-weight: 600;
+        padding-right: 12px;
+        min-width: 90px;
+        text-align: left;
+      }
+      .detail-item > div:last-child {
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
       }
       .biodata-profile-image {
         width: 120px;
@@ -119,81 +139,44 @@
     <div id="template-content">
       <img src="{{ border_image_path|default:'/assets/border/bg8.jpg' }}" class="template-border" alt="Border" />
       <div class="template-inner">
-        {% if profile_image_path %}
-        <img src="{{ profile_image_path }}" class="biodata-profile-image" alt="Profile" />
-        {% elif biodata.profile_image %}
-        <img src="{{ biodata.profile_image.url }}" class="biodata-profile-image" alt="Profile" />
+        {% if personal_pairs %}
+        <div class="section-pill">Personal Details</div>
+        <table class="details-table">
+          {% for left, right in personal_pairs %}
+          <tr>
+            <td class="label">{{ left.0 }}</td>
+            <td class="value">{{ left.1 }}</td>
+            <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+            <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </table>
         {% endif %}
-
-        <h2 class="biodata-name">{{ biodata.data.PersonalDetails.name|default:'' }}</h2>
-      {% if biodata.data.PersonalDetails %}
-      <div class="section-pill">Personal Details</div>
-      <div class="detail-columns">
-            <div class="col">
-              {% if personal_left %}
-                {% for key,value in personal_left %}
-                  <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-                {% endfor %}
-              {% else %}
-                {% for key,value in biodata.data.PersonalDetails.items %}
-                  <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-                {% endfor %}
-              {% endif %}
-            </div>
-            <div class="col">
-              {% if personal_right %}
-                {% for key,value in personal_right %}
-                  <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-                {% endfor %}
-              {% endif %}
-            </div>
-          </div>
-      {% endif %}
-      {% if biodata.data.FamilyDetails %}
-      <div style="margin-top: 20px" class="section-pill">Family Details</div>
-      <div class="detail-columns">
-          <div class="col">
-            {% if family_left %}
-              {% for key,value in family_left %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% else %}
-              {% for key,value in biodata.data.FamilyDetails.items %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% endif %}
-          </div>
-          <div class="col">
-            {% if family_right %}
-              {% for key,value in family_right %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
+        {% if family_pairs %}
+        <div class="section-pill" style="margin-top: 32px;">Family Details</div>
+        <table class="details-table">
+          {% for left, right in family_pairs %}
+          <tr>
+            <td class="label">{{ left.0 }}</td>
+            <td class="value">{{ left.1 }}</td>
+            <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+            <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </table>
         {% endif %}
-      {% if biodata.data.HabitsDeclaration %}
-      <div style="margin-top: 20px" class="section-pill">Habits & Declaration</div>
-      <div class="detail-columns">
-          <div class="col">
-            {% if habits_left %}
-              {% for key,value in habits_left %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% else %}
-              {% for key,value in biodata.data.HabitsDeclaration.items %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% endif %}
-          </div>
-          <div class="col">
-            {% if habits_right %}
-              {% for key,value in habits_right %}
-                <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
+        {% if habits_pairs %}
+        <div class="section-pill" style="margin-top: 32px;">Habits & Declaration</div>
+        <table class="details-table">
+          {% for left, right in habits_pairs %}
+          <tr>
+            <td class="label">{{ left.0 }}</td>
+            <td class="value">{{ left.1 }}</td>
+            <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+            <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </table>
         {% endif %}
       </div>
     </div>

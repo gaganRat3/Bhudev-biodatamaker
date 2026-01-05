@@ -130,9 +130,26 @@
       }
 
       .detail-item {
-        margin-bottom: 8px;
-        font-size: 12px;
-        line-height: 1.4;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dotted #4169e1;
+        min-height: 32px;
+        font-size: 1rem;
+        max-width: 100%;
+      }
+      .detail-item > div:first-child {
+        font-weight: 600;
+        padding-right: 12px;
+        min-width: 90px;
+        text-align: left;
+      }
+      .detail-item > div:last-child {
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
       }
 
       .detail-label {
@@ -150,14 +167,13 @@
         clear: both;
       }
 
-      .footer-disclaimer {
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        margin-left: -315px;
-        width: 630px;
-        text-align: center;
-        font-size: 10px;
+      .two-column-grid {
+        display: flex;
+        gap: 4%;
+      }
+      .grid-column {
+        flex: 1 1 0;
+      }
         color: #666;
         border-top: 1px dashed #ccc;
         padding-top: 10px;
@@ -199,68 +215,74 @@
         <div class="content-section">
           {% if personal_left or personal_right %}
           <div class="section-title">PERSONAL DETAILS</div>
-          <div class="two-column-grid clearfix">
-            <div class="grid-column">
-              {% for key, value in personal_left %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+            <div class="two-column-grid clearfix">
+              <div class="grid-column">
+                {% if personal_left %}
+                  {% for key,value in personal_left %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% else %}
+                  {% for key,value in biodata.data.PersonalDetails.items %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
-            </div>
-            <div class="grid-column">
-              {% for key, value in personal_right %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+              <div class="grid-column">
+                {% if personal_right %}
+                  {% for key,value in personal_right %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
             </div>
-          </div>
           {% endif %}
 
           {% if family_left or family_right %}
           <div class="section-title">FAMILY DETAILS</div>
-          <div class="two-column-grid clearfix">
-            <div class="grid-column">
-              {% for key, value in family_left %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+            <div class="two-column-grid clearfix">
+              <div class="grid-column">
+                {% if family_left %}
+                  {% for key,value in family_left %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% else %}
+                  {% for key,value in biodata.data.FamilyDetails.items %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
-            </div>
-            <div class="grid-column">
-              {% for key, value in family_right %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+              <div class="grid-column">
+                {% if family_right %}
+                  {% for key,value in family_right %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
             </div>
-          </div>
           {% endif %}
 
           {% if habits_left or habits_right %}
           <div class="section-title">HABITS & DECLARATION</div>
-          <div class="two-column-grid clearfix">
-            <div class="grid-column">
-              {% for key, value in habits_left %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+            <div class="two-column-grid clearfix">
+              <div class="grid-column">
+                {% if habits_left %}
+                  {% for key,value in habits_left %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% else %}
+                  {% for key,value in biodata.data.HabitsDeclaration.items %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
-            </div>
-            <div class="grid-column">
-              {% for key, value in habits_right %}
-              <div class="detail-item">
-                <div class="detail-label">{{ key|title }}</div>
-                <div class="detail-value">{{ value }}</div>
+              <div class="grid-column">
+                {% if habits_right %}
+                  {% for key,value in habits_right %}
+                    <div class="detail-item"><span class="detail-label">{{ key|title }}:</span> <span class="detail-value">{{ value }}</span></div>
+                  {% endfor %}
+                {% endif %}
               </div>
-              {% endfor %}
             </div>
-          </div>
           {% endif %}
         </div>
       </div>

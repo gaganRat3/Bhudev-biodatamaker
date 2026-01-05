@@ -32,16 +32,15 @@
         height: 100%;
         display: block;
         z-index: 0;
-        pointer-events: none;
-      }
-
-      .template-inner {
-        position: relative;
-      .template-inner {
-        position: relative;
-        z-index: 1;
-        background: transparent;
-        width: 100%;
+          .detail-columns {
+            display: flex;
+            gap: 4%;
+            margin-top: 8px;
+          }
+          .detail-columns .col {
+            flex: 1 1 0;
+            margin-right: 0;
+          }
         height: 100%;
         padding: 80px 100px;
         box-sizing: border-box;
@@ -64,23 +63,23 @@
         margin: 0 auto 16px;
       }
       /* PDF-friendly two-column layout (avoid CSS Grid for xhtml2pdf) */
-      .detail-columns {
-        overflow: hidden;
-        margin-top: 8px;
+      .details-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
       }
-      .detail-columns .col {
-        float: left;
-        width: 48%;
-        margin-right: 4%;
+      .details-table td.label {
+        font-weight: bold;
+        padding: 8px 8px 8px 0;
+        width: 25%;
+        vertical-align: top;
+        color: #2c3e50;
       }
-      .detail-columns .col:last-child { margin-right: 0; }
-      .detail-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-        border-bottom: 1px dotted #ddd;
-      }
-        border-bottom: 1px dotted #ddd;
+      .details-table td.value {
+        padding: 8px 8px;
+        width: 25%;
+        vertical-align: top;
+        color: #2c3e50;
       }
       .biodata-profile-image {
         width: 120px;
@@ -104,74 +103,44 @@
         {% endif %}
 
         <h2 class="biodata-name">{{ biodata.data.PersonalDetails.name|default:'' }}</h2>
-      {% if biodata.data.PersonalDetails %}
+      {% if personal_pairs %}
       <div class="section-pill">Personal Details</div>
-      <div class="detail-columns">
-        <div class="col">
-          {% if personal_left %}
-            {% for key,value in personal_left %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% else %}
-            {% for key,value in biodata.data.PersonalDetails.items %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-        <div class="col">
-          {% if personal_right %}
-            {% for key,value in personal_right %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
+      <table class="details-table">
+        {% for left, right in personal_pairs %}
+        <tr>
+          <td class="label">{{ left.0 }}</td>
+          <td class="value">{{ left.1 }}</td>
+          <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+          <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
       {% endif %}
-      {% if biodata.data.FamilyDetails %}
-      <div style="margin-top: 20px" class="section-pill">Family Details</div>
-      <div class="detail-columns">
-        <div class="col">
-          {% if family_left %}
-            {% for key,value in family_left %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% else %}
-            {% for key,value in biodata.data.FamilyDetails.items %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-        <div class="col">
-          {% if family_right %}
-            {% for key,value in family_right %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
+      {% if family_pairs %}
+      <div class="section-pill" style="margin-top: 32px;">Family Details</div>
+      <table class="details-table">
+        {% for left, right in family_pairs %}
+        <tr>
+          <td class="label">{{ left.0 }}</td>
+          <td class="value">{{ left.1 }}</td>
+          <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+          <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
       {% endif %}
-      {% if biodata.data.HabitsDeclaration %}
-      <div style="margin-top: 20px" class="section-pill">Habits & Declaration</div>
-      <div class="detail-columns">
-        <div class="col">
-          {% if habits_left %}
-            {% for key,value in habits_left %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% else %}
-            {% for key,value in biodata.data.HabitsDeclaration.items %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-        <div class="col">
-          {% if habits_right %}
-            {% for key,value in habits_right %}
-              <div class="detail-item"><div>{{ key|title }}</div><div>{{ value }}</div></div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
+      {% if habits_pairs %}
+      <div class="section-pill" style="margin-top: 32px;">Habits & Declaration</div>
+      <table class="details-table">
+        {% for left, right in habits_pairs %}
+        <tr>
+          <td class="label">{{ left.0 }}</td>
+          <td class="value">{{ left.1 }}</td>
+          <td class="label">{% if right.0 %}{{ right.0 }}{% endif %}</td>
+          <td class="value">{% if right.1 %}{{ right.1 }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
       {% endif %}
       </div>
     </div>
