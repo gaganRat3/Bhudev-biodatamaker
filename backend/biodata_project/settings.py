@@ -81,6 +81,8 @@ ALLOWED_HOSTS = [
     'biodata-maker-bhudevnetwork.pythonanywhere.com',  # PythonAnywhere converts underscores to hyphens
     'keyla-mirier-pebbly.ngrok-free.dev',
     'www.keyla-mirier-pebbly.ngrok-free.dev',
+    '5af6a507d397.ngrok-free.app',
+    'www.5af6a507d397.ngrok-free.app',
     'localhost',
     '127.0.0.1'
 ]
