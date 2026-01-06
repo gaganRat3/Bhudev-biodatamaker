@@ -432,6 +432,9 @@ function backToGallery() {
 
 // Render template
 function renderTemplate(templateId) {
+    // Add credit line for all templates
+    const oldCredit = document.getElementById("free-credit-line");
+    if (oldCredit) oldCredit.remove();
   const container = document.getElementById("template-content");
   if (!container) return;
 
@@ -445,6 +448,72 @@ function renderTemplate(templateId) {
   let borderClass = "border-style-" + (templateId === 1 ? "1" : templateId);
   if (templateId === 1) borderClass = "free-border"; // override for free
   container.className = borderClass;
+
+  // Add simple black border and watermark for free template
+  // Add credit line at bottom left for all templates
+  if (templateId === 1) {
+    setTimeout(() => {
+      // Remove all existing credit lines before adding a new one
+      const oldCredits = container.querySelectorAll('#free-credit-line');
+      oldCredits.forEach(el => el.remove());
+      const credit = document.createElement("div");
+      credit.id = "free-credit-line";
+      credit.style.position = "absolute";
+      credit.style.left = "28px";
+      credit.style.bottom = "18px";
+      credit.style.fontSize = "1rem";
+      credit.style.color = "#888";
+      credit.style.opacity = "0.92";
+      credit.style.fontWeight = "500";
+      credit.style.zIndex = "10000";
+      credit.style.userSelect = "none";
+      credit.style.background = "rgba(255,255,255,0.7)";
+      credit.style.padding = "2px 10px 2px 4px";
+      credit.style.borderRadius = "6px";
+      credit.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)";
+      credit.innerHTML = 'Free Design online by : <a href="https://bhudevnetworkvivah.com" target="_blank" style="color:#888;text-decoration:underline;pointer-events:auto;">BhudevNetworkVivah.com</a>';
+      container.appendChild(credit);
+    }, 0);
+  }
+
+  if (templateId === 1) {
+    container.style.border = "4px solid #111";
+    container.style.background = "#fff";
+    container.style.boxShadow = "none";
+    container.style.position = "relative";
+    // Remove any existing watermark
+    const oldWm = document.getElementById("free-watermark");
+    if (oldWm) oldWm.remove();
+    // Add watermark as last child for visibility
+    setTimeout(() => {
+      const wm = document.createElement("div");
+      wm.id = "free-watermark";
+      wm.textContent = "bhudevnetworkvivah.com";
+      wm.style.position = "absolute";
+      wm.style.left = "50%";
+      wm.style.top = "50%";
+      wm.style.transform = "translate(-50%, -50%) rotate(-25deg)";
+      wm.style.textAlign = "center";
+      wm.style.opacity = "0.13";
+      wm.style.fontSize = "1.7rem";
+      wm.style.letterSpacing = "2px";
+      wm.style.fontWeight = "bold";
+      wm.style.pointerEvents = "none";
+      wm.style.userSelect = "none";
+      wm.style.zIndex = "9999";
+      wm.style.width = "100%";
+      wm.style.whiteSpace = "nowrap";
+      container.appendChild(wm);
+    }, 0);
+  } else {
+    container.style.border = "none";
+    container.style.background = "";
+    container.style.boxShadow = "";
+    const oldWm = document.getElementById("free-watermark");
+    if (oldWm) oldWm.remove();
+    const oldCredit = document.getElementById("free-credit-line");
+    if (oldCredit) oldCredit.remove();
+  }
 
   // Build main biodata content wrapper.
   const biodataContent = document.createElement("div");
@@ -470,10 +539,11 @@ function renderTemplate(templateId) {
 
   // Helper: produce section element with two-column split.
   function buildSection(title, obj) {
+    // Only include fields with non-empty values
     const entries = Object.entries(obj || {}).filter(
-      ([, v]) => v && String(v).trim()
+      ([, v]) => v !== undefined && v !== null && String(v).trim() !== ""
     );
-    if (!entries.length) return null;
+    if (entries.length === 0) return null;
     const sectionEl = document.createElement("div");
     sectionEl.className = "biodata-section";
 
@@ -487,7 +557,7 @@ function renderTemplate(templateId) {
     const rightEntries = entries.slice(mid);
 
     const columnsWrapper = document.createElement("div");
-    columnsWrapper.className = "detail-columns"; // styled in template-page.html
+    columnsWrapper.className = "detail-columns";
 
     const leftCol = document.createElement("div");
     leftCol.style.display = "flex";
@@ -527,10 +597,8 @@ function renderTemplate(templateId) {
   if (personal) biodataContent.appendChild(personal);
   const family = buildSection("Family Details", formData.FamilyDetails);
   if (family) biodataContent.appendChild(family);
-  const habits = buildSection(
-    "Habits & Declaration",
-    formData.HabitsDeclaration
-  );
+  // Only show 'Habits & Declaration' if there is data
+  const habits = buildSection("Habits & Declaration", formData.HabitsDeclaration);
   if (habits) biodataContent.appendChild(habits);
 
   // Render.
@@ -949,6 +1017,10 @@ window.sendFreeTemplateToEmail = sendFreeTemplateToEmail;
 
 // Automatically generate and upload PDF after approval
 async function autoGenerateAndSendPDF(email) {
+  // Force re-render to ensure empty sections are hidden
+  if (typeof renderTemplate === "function" && typeof selectedTemplate !== "undefined") {
+    renderTemplate(selectedTemplate);
+  }
   const element = document.getElementById("template-content");
   if (!element || !email) return;
   const opt = {

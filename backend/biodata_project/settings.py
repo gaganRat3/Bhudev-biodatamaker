@@ -82,7 +82,7 @@ ALLOWED_HOSTS = [
     'keyla-mirier-pebbly.ngrok-free.dev',
     'www.keyla-mirier-pebbly.ngrok-free.dev',
     '5af6a507d397.ngrok-free.app',
-    'www.5af6a507d397.ngrok-free.app',
+    'c59b372de4c4.ngrok-free.app',
     'localhost',
     '127.0.0.1'
 ]
@@ -167,7 +167,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allow CORS from the frontend during development and ngrok
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    'https://keyla-mirier-pebbly.ngrok-free.dev',
+    'https://c59b372de4c4.ngrok-free.app',
 ]
 
 # Django REST Framework
